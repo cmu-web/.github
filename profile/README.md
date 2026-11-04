@@ -1,14 +1,18 @@
-Tools for Carnegie Mellon websites and web apps built on the CMU web
-template. Each one builds on the template and follows its look; for brand
-questions, see [brand.cmu.edu](https://www.cmu.edu/brand/).
+A little less setup. A little more Carnegie Mellon.
 
-| Project                                                                     | Repository                                                              | What It Does                                                                              |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [Carnegie Mellon Web Kit](https://cmu-web.github.io/cmu-web-kit/)           | [`cmu-web-kit`](https://github.com/cmu-web/cmu-web-kit)                 | CSS and JavaScript components for CMS sites and web apps, extending the CMU web template. |
-| [Carnegie Mellon Web Markdown](https://cmu-web.github.io/cmu-web-markdown/) | [`cmu-web-markdown`](https://github.com/cmu-web/cmu-web-markdown)       | A GitHub Pages theme that turns plain Markdown into pages in CMU style.                   |
-| [PlaceMellon](https://cmu-web.github.io/cmu-web-placemellon/)               | [`cmu-web-placemellon`](https://github.com/cmu-web/cmu-web-placemellon) | Placeholder photos of Carnegie Mellon for mockups and examples.                           |
+Tools for building websites and web apps with the CMU web template's familiar
+look. Bring the content; these projects help with the components, pages and
+pictures.
 
-All three are listed at [cmu-web.github.io](https://cmu-web.github.io/).
-They're maintained by the Office of the Vice Provost for Teaching and
-Learning Innovation at Carnegie Mellon University. Questions and
-suggestions are welcome in each project's issues.
+| Project                                                                     | Repository                                                              | What It Does                                                                            |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [Carnegie Mellon Web Kit](https://cmu-web.github.io/cmu-web-kit/)           | [`cmu-web-kit`](https://github.com/cmu-web/cmu-web-kit)                 | Extends the CMU web template with CSS and JavaScript components for CMS sites and apps. |
+| [Carnegie Mellon Web Markdown](https://cmu-web.github.io/cmu-web-markdown/) | [`cmu-web-markdown`](https://github.com/cmu-web/cmu-web-markdown)       | Turns plain Markdown into CMU-styled pages with a GitHub Pages theme.                   |
+| [PlaceMellon](https://placemellon.andrew.cmu.edu/)                          | [`cmu-web-placemellon`](https://github.com/cmu-web/cmu-web-placemellon) | Gives mockups and examples a campus view with Carnegie Mellon placeholder photos.       |
+
+Explore all three at [cmu-web.github.io](https://cmu-web.github.io/). For brand
+guidance, visit [brand.cmu.edu](https://www.cmu.edu/brand/).
+
+Maintained by the Office of the Vice Provost for Teaching and Learning
+Innovation at Carnegie Mellon University. Have a question or an idea? Open an
+issue in the relevant project's repository.
