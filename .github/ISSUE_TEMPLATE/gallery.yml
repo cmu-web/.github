@@ -1,0 +1,70 @@
+name: Gallery Entry
+description: For us, from a Gallery form response. Copy over only what goes on the page.
+title: "Gallery: "
+labels: [gallery]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submissions come in through the Gallery form, which is private. This issue is public,
+        so copy only what will appear on the page: never the submitter's name or email, and
+        nothing from a screenshot that shows real people's data.
+
+        To publish it:
+        1. Confirm the form's permission box is checked.
+        2. For a site or app, take the screenshot from a FencePost checkout, signed out:
+           `npm run gallery -- <address> gallery-<name>.webp`. For a QR code, use the photo
+           the form links to.
+        3. Open a pull request that adds the entry and the image, in the Web Kilt repository
+           for its Gallery, in cmu-web.github.io for the CMU Web Gallery, or both, and link
+           this issue.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What It Is
+      options:
+        - A site or app built with the Web Kilt
+        - A site built with Jekyll & Plaid
+        - A QRnegie code in the wild (a poster, slide, table tent and so on)
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: What the site, app or event is called.
+    validations:
+      required: true
+  - type: input
+    id: address
+    attributes:
+      label: Address
+      description: For a site or app, the public page to capture. For a QR code, where it was seen.
+    validations:
+      required: true
+  - type: input
+    id: built-with
+    attributes:
+      label: Built With
+      description: For a site or app, such as Cascade, WordPress, Rails or Django. It sets the card's pills.
+  - type: input
+    id: owner
+    attributes:
+      label: Who Runs It
+      description: The office, department or group, as it should appear on the page.
+  - type: textarea
+    id: about
+    attributes:
+      label: Caption
+      description: A sentence or two for the card, from the form's About It, edited for the page.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before the Pull Request
+      options:
+        - label: The form's permission box is checked.
+          required: true
+        - label: Nothing here identifies the person who sent it.
+          required: true
