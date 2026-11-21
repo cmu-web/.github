@@ -6,9 +6,14 @@ body:
     id: where
     attributes:
       label: Where
-      description: The page, component, or PlaceMellon address, with a link if there is one.
+      description: The page or component, with a link if there is one.
     validations:
       required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The project's version, and the app's if it's a theme (e.g., Vaultwarden 1.37.5).
   - type: textarea
     id: what-happened
     attributes:
