@@ -1,0 +1,158 @@
+# Shared by CMU Web projects: serves the project's docs inside the job,
+# captures them with FencePost's Make Preview Images action, and commits the
+# images back when the page looks different. A screenshot is never byte for
+# byte the same twice, so the images are compared by eye, as it were: a new
+# image replaces the old one only when they differ by more than THRESHOLD.
+# A project calls this from its own update-preview-images.yml; a page whose
+# content animates in or loads late can set delay (0 to 10 seconds).
+name: Update Preview Images
+
+on:
+  workflow_call:
+    inputs:
+      serve:
+        description: >-
+          A command that serves the docs and keeps running, such as
+          "python3 -m http.server 4200 --directory docs". It runs in the
+          background after the setup command.
+        type: string
+        required: true
+      setup:
+        description: A command to run first, such as "npm ci && npm run build". Blank skips it.
+        type: string
+        default: ""
+      url:
+        description: The page to capture, as the serve command serves it.
+        type: string
+        required: true
+      node-version:
+        description: The Node version to set up first. Blank skips it.
+        type: string
+        default: ""
+      preview:
+        description: Where the 1200 × 630 link preview image lives. Blank skips it.
+        type: string
+        default: docs/images/preview.jpg
+      card:
+        description: Where the 1040 × 656 card screenshot lives. Blank skips it.
+        type: string
+        default: docs/images/cmu-web-preview.webp
+      phone:
+        description: Where the phone screenshot lives. Blank skips it.
+        type: string
+        default: ""
+      delay:
+        description: Seconds to wait after the page loads, 0 to 10.
+        type: string
+        default: "0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-preview-images-${{ github.repository }}-${{ github.ref }}
+
+env:
+  # How much the picture has to change, as the average change in brightness,
+  # before the new image replaces the old one. The same page captures the
+  # same image, so this only has to ignore something like a countdown; a
+  # one-word change measures more.
+  THRESHOLD: "0.001"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      # To commit the new images to the branch
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: inputs.node-version != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+      - name: Set up the site
+        if: inputs.setup != ''
+        env:
+          SETUP: ${{ inputs.setup }}
+        run: bash -c "$SETUP"
+      - name: Serve the docs
+        env:
+          SERVE: ${{ inputs.serve }}
+          URL: ${{ inputs.url }}
+        run: |
+          nohup bash -c "$SERVE" > "$RUNNER_TEMP/serve.log" 2>&1 &
+          for attempt in $(seq 1 60); do
+            curl --fail --silent --output /dev/null "$URL" && exit 0
+            sleep 2
+          done
+          echo "::error::Nothing answered at $URL"
+          cat "$RUNNER_TEMP/serve.log"
+          exit 1
+      - id: shoot
+        uses: cmu-web/cmu-web-fencepost@e7f279cbfdeae86c48b3f45e8ded77a2ae4fdcad # 0.2.1
+        with:
+          url: ${{ inputs.url }}
+          preview: ${{ inputs.preview != '' && '.preview-images/preview.jpg' || '' }}
+          card: ${{ inputs.card != '' && '.preview-images/card.webp' || '' }}
+          phone: ${{ inputs.phone != '' && '.preview-images/phone.webp' || '' }}
+          delay: ${{ inputs.delay }}
+      - name: Keep the images that changed
+        env:
+          PREVIEW: ${{ inputs.preview }}
+          CARD: ${{ inputs.card }}
+          PHONE: ${{ inputs.phone }}
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pillow==11.3.0
+          python3 - <<'PY'
+          import os, shutil
+          from PIL import Image, ImageChops, ImageStat
+
+          # FencePost writes a .jpg preview and .webp screenshots; each goes
+          # where the project keeps it, as FencePost made it
+          threshold = float(os.environ["THRESHOLD"])
+          pairs = [
+              (".preview-images/preview.jpg", os.environ["PREVIEW"]),
+              (".preview-images/card.webp", os.environ["CARD"]),
+              (".preview-images/phone.webp", os.environ["PHONE"]),
+          ]
+          for new, old in pairs:
+              if not old or not os.path.exists(new):
+                  continue
+              if os.path.exists(old):
+                  a = Image.open(new).convert("L")
+                  b = Image.open(old).convert("L")
+                  if a.size == b.size:
+                      change = ImageStat.Stat(ImageChops.difference(a, b)).mean[0] / 255
+                      print(f"{old}: {change:.4f} changed")
+                      if change <= threshold:
+                          continue
+              os.makedirs(os.path.dirname(old) or ".", exist_ok=True)
+              if os.path.splitext(new)[1] == os.path.splitext(old)[1]:
+                  shutil.copyfile(new, old)
+              else:
+                  Image.open(new).save(old)
+              print(f"{old}: replaced")
+          PY
+          rm -rf .preview-images
+      - name: Commit the images
+        env:
+          BRANCH: ${{ github.ref_name }}
+          PREVIEW: ${{ inputs.preview }}
+          CARD: ${{ inputs.card }}
+          PHONE: ${{ inputs.phone }}
+        run: |
+          for image in "$PREVIEW" "$CARD" "$PHONE"; do
+            if [ -n "$image" ] && [ -f "$image" ]; then git add -- "$image"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "The images match the page."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet --message "docs: update the preview images"
+          git pull --rebase --quiet origin "$BRANCH"
+          git push --quiet origin "HEAD:$BRANCH"
