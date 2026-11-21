@@ -30,7 +30,7 @@ DEVELOPMENT.md covers its commands; this page covers the tools they share.
 | Jekyll & Plaid        | Ruby                        | `bundle exec rake test` in `packages/jekyll`                      | None                                                             | `bundle exec jekyll serve` in `docs/` (see its DEVELOPMENT.md) |
 | Forbes & Moreword     | PHP (WordPress), in Docker  | `dev/run.sh check` (with `dev/run.sh up` running)                 | `npm run test:browser`, or `dev/run.sh browser` with Docker only | `dev/run.sh up`                                                |
 | Scaife & Sound        | Python                      | `python3 tools/build.py`                                          | `python3 test/run.py` (Docker or Podman)                         | `python3 test/run.py` starts Vaultwarden with the theme        |
-| The Cut & Paste       | Python                      | `python3 tools/pages.py` (builds the pages; no checks yet)        | None                                                             | `python3 -m http.server 4200 --directory docs`                 |
+| The Cut List          | Python                      | `python3 tools/pages.py` (builds the pages; no checks yet)        | None                                                             | `python3 -m http.server 4200 --directory docs`                 |
 
 ## Checks
 
@@ -113,10 +113,11 @@ projects from the repositories themselves. There's no list to edit by hand.
 - **Address:** the repository's website on GitHub. The README's Site line
   matches it.
 - **Picture:** the README's image (`docs/images/preview.jpg` for a tool,
-  `in-use.jpg` for a theme).
+  `in-use.jpg` for a theme), or a placeholder until it has one.
 - **Tool or theme:** the repository's topic: `cmu-web-tool`,
-  `cmu-web-theme-site` or `cmu-web-theme-app`. Only these exact topics list
-  a project. `cmu-web-tool-addon` marks a part of another project, such as
+  `cmu-web-theme-site`, `cmu-web-theme-app` or `cmu-web-theme-document` (a
+  theme for documents, such as LaTeX). Only these exact topics list a
+  project. `cmu-web-tool-addon` marks a part of another project, such as
   an MCP server, which is reached from that project instead.
 
 The home page rebuilds every hour and reads the current values, so a changed
