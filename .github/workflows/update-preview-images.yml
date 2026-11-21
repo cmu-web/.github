@@ -1,8 +1,8 @@
 # Shared by CMU Web projects: serves the project's docs inside the job,
 # captures them with FencePost's Make Preview Images action, and commits the
-# images back when the page looks different. A screenshot is never byte for
-# byte the same twice, so the images are compared by eye, as it were: a new
-# image replaces the old one only when they differ by more than THRESHOLD.
+# images back when the page looks different: a new image replaces the old one
+# only when more than THRESHOLD pixels changed, so a run on an unchanged page
+# commits nothing.
 # A project calls this from its own update-preview-images.yml; a page whose
 # content animates in or loads late can set delay (0 to 10 seconds).
 name: Update Preview Images
@@ -53,11 +53,11 @@ concurrency:
   group: update-preview-images-${{ github.repository }}-${{ github.ref }}
 
 env:
-  # How much the picture has to change, as the average change in brightness,
-  # before the new image replaces the old one. The same page captures the
-  # same image, so this only has to ignore something like a countdown; a
-  # one-word change measures more.
-  THRESHOLD: "0.001"
+  # How many pixels have to change before the new image replaces the old one.
+  # The same page captures the same image, pixel for pixel, so this only has
+  # to ignore a stray pixel; one changed letter in small text changes
+  # hundreds.
+  THRESHOLD: "20"
 
 jobs:
   update:
@@ -108,11 +108,11 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check pillow==11.3.0
           python3 - <<'PY'
           import os, shutil
-          from PIL import Image, ImageChops, ImageStat
+          from PIL import Image, ImageChops
 
           # FencePost writes a .jpg preview and .webp screenshots; each goes
           # where the project keeps it, as FencePost made it
-          threshold = float(os.environ["THRESHOLD"])
+          threshold = int(os.environ["THRESHOLD"])
           pairs = [
               (".preview-images/preview.jpg", os.environ["PREVIEW"]),
               (".preview-images/card.webp", os.environ["CARD"]),
@@ -125,9 +125,12 @@ jobs:
                   a = Image.open(new).convert("L")
                   b = Image.open(old).convert("L")
                   if a.size == b.size:
-                      change = ImageStat.Stat(ImageChops.difference(a, b)).mean[0] / 255
-                      print(f"{old}: {change:.4f} changed")
-                      if change <= threshold:
+                      # A pixel counts when its brightness moved by more than an
+                      # eighth, which JPEG noise never does
+                      diff = ImageChops.difference(a, b).point(lambda v: 255 if v > 32 else 0)
+                      changed = diff.histogram()[255]
+                      print(f"{old}: {changed} pixels changed")
+                      if changed <= threshold:
                           continue
               os.makedirs(os.path.dirname(old) or ".", exist_ok=True)
               if os.path.splitext(new)[1] == os.path.splitext(old)[1]:
