@@ -15,9 +15,9 @@ body:
         2. For a site or app, take the screenshot from a FencePost checkout, signed out:
            `npm run gallery -- <address> gallery-<name>.webp`. For a QR code, use the photo
            the form links to.
-        3. Open a pull request that adds the entry and the image, in the Web Kilt repository
-           for its Gallery, in cmu-web.github.io for the CMU Web Gallery, or both, and link
-           this issue.
+        3. Open a pull request that adds the entry and the image to the project's
+           `docs/gallery.json` (the Web Kilt's, or the theme's), and link this issue. The CMU Web
+           Gallery picks up every project's entries on its next build.
   - type: dropdown
     id: kind
     attributes:
@@ -25,7 +25,8 @@ body:
       options:
         - A site or app built with the Web Kilt
         - A site built with Jekyll & Plaid
-        - A QRnegie code in the wild (a poster, slide, table tent and so on)
+        - A site built with Forbes & Moreword
+        - A QRnegie code in use (e.g., on a poster, slide or table tent)
     validations:
       required: true
   - type: input
@@ -46,7 +47,7 @@ body:
     id: built-with
     attributes:
       label: Built With
-      description: For a site or app, such as Cascade, WordPress, Rails or Django. It sets the card's pills.
+      description: For a site or app (e.g., Cascade, WordPress or Rails). It sets the card's pills.
   - type: input
     id: owner
     attributes:
