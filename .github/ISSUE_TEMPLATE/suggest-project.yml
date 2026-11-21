@@ -1,0 +1,29 @@
+name: Suggest a Project
+description: An idea for a new CMU Web tool or theme.
+title: "Idea: "
+labels: [idea]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a new tool or theme. For something an existing project should do, use Feature
+        Request in that project's repository instead.
+  - type: textarea
+    id: idea
+    attributes:
+      label: The Idea
+      description: What it would do.
+    validations:
+      required: true
+  - type: textarea
+    id: who
+    attributes:
+      label: Who It Would Help
+      description: Who would use it, and what they do today instead.
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or Links
+      description: Similar tools, or pages that show the problem.
